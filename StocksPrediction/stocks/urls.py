@@ -5,5 +5,5 @@ urlpatterns = [
     path('',views.index,name="index"),
     path('safe',views.safe,name="safe"),
     path('risk',views.risk,name="risk"),
-    path('company/<str:comp>', views.company,name='company')
+    path('company/<int:company_id>', views.company,name='company')
 ]

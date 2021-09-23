@@ -1,4 +1,9 @@
-from django.shortcuts import render, HttpResponse
+import tensorflow as tf
+from django.shortcuts import render
+import pandas as pd
+import tensorflow.keras.models as tf
+from stocks.functions import *
+from stocks.models import Companies
 
 
 def index(requests):
@@ -10,14 +15,19 @@ def safe(requests):
 
 
 def risk(requests):
-    context = {
-        'companies': [
-            {'name': 'Aviat Networks', 'field': 'Network managment', 'ccp': 'val','initial':'avnw'},
-            {'name': 'Fulgent Genetics','field': 'Combination of Gentics, Molecular Biology, Computer Science', 'ccp': 'val','initial':'flgt'},
-            {'name': 'Zedge', 'field': 'Content Discovery Platform', 'ccp': 'val','initial':'zdg'}
-        ]
-    }
+    comp_list = Companies.objects.filter(type_of_investment='risk')
+    context = {"companies":comp_list}
     return render(requests, 'stocks/risk.html', context=context)
 
-def company(requests,comp):
-    return HttpResponse(comp)
+def company(requests,company_id):
+    comp = Companies.objects.filter(company_id = company_id)[0]
+    data_file = 'static/'+"".join(comp.name.split(" ")) + '.csv'
+    pkl_file = 'static/' +"".join(comp.name.split(" ")) + '.pkl'
+    df = pd.read_csv(data_file)
+    model = tf.load_model(pkl_file)
+    context = merge(df,model)
+    context['info'] = comp
+    context['graph'] = return_graph(df.filter(['Close']), context['output'])
+    return render(requests,'stocks/company.html',context=context)
+
+
