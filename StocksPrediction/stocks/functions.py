@@ -5,11 +5,11 @@ from itertools import chain
 import matplotlib.pyplot as plt
 from io import StringIO
 
-def merge(df, model):
+def merge(df, model,numberofdays):
     df = df.dropna(how='any')
     data = df.filter(['Close']).values
     test_data, scaler = scaledData(data)
-    output = prediction(10, test_data, scaler, model)
+    output = prediction(numberofdays, test_data, scaler, model)
     lst_final = convert_input(output)
     mx = findMax(lst_final)
     mn = findMin(lst_final)
@@ -23,7 +23,7 @@ def scaledData(data):
     scaled_data = scaler.fit_transform(data)
     train_data_len = math.ceil(len(data) * 0.80)
     test_data = scaled_data[train_data_len - 110:, :]
-    return (test_data[151:], scaler)
+    return (test_data[len(test_data)-110:], scaler)
 
 
 def prediction(num, test_data, scaler, model):
@@ -113,14 +113,14 @@ def finalProfit(profit):
         if p >= mx:
             px, py, pro = x, y, p
             mx = p
-    return (px, py, pro)
+    return (px, py, round(pro,2))
 
 
 
 
-def return_graph(df,output):
-    day_new = np.arange(1, 756)
-    day_pred = np.arange(756, 756+10)
+def return_graph(df,output,numberofdays):
+    day_new = np.arange(1, len(df)+1)
+    day_pred = np.arange(len(df)+1, len(df)+numberofdays+1)
     fig  = plt.figure(figsize=(14, 6))
 
     plt.plot(day_new, df[['Close']])

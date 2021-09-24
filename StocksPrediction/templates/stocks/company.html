@@ -23,22 +23,39 @@
 <body>
     <div class="container info">
         <br>
-        <h1 style="color: red; font-weight: 100;">{{info.name}} </h1>
-        <br>
-        <h5>{{ info.field }} </h5>
-        <p>Type of investment <b>{{info.type_of_investment}} </b> </p>
+        <h1 style="color: red; font-weight: 100;"><u>{{info.name}}</u></h1>
         <br>
         <a href="/" class="btn btn-success">Home Page</a>
         <br>
-        <p> Minimum Price <b> {{mn.0.0}} </b> </p> 
-        <p> Maximum Price <b>{{mx.0.0}} </b></p> 
-        <p> Maximum Profit  <b>{{profit.0.2}} </b> </p> 
-        <p> Final Profit <b> {{final_profit.2}} </b> </p>
+        <h5>{{ info.field }} </h5>
+        <p>Type of investment <b>{{info.type_of_investment}} </b> </p>
+        
         <br>
+        <form method="POST" action="/company/{{ info.company_id }}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="numberofdays">Enter number of days to predict </label>
+                <input type="number" class="form-control py-2" id="numberofdays" placeholder="Example 10 days" value="{{numberofdays}}" name="numberofdays" min="5" max="30">
+                <button type="submit" class="btn btn-success my-2">Submit</button>
+            </div>
+        </form>
+        <br>
+        <!-- <p> Minimum Price <b> {{mn.0.0}} </b> </p> 
+        <p> Maximum Price <b>{{mx.0.0}} </b></p>  -->
+        <!-- <p> Maximum Profit  <b>{{profit.0.2}} </b> </p>   -->
+        <!-- <p> Final Profit <b> {{final_profit.2}} </b> </p> -->
     </div>
     <div class="container info">
-        <h1> Our predictions</h1>
-    {{ graph|safe }}
+        {%if numberofdays > 0 %}
+        <p class="px-5"> We expect that the price of the stocks of {{ info.name }} {% if final_profit.2 > 0 %} <b> will increase
+            </b> and the best time to invest is after {{final_profit.0}}th day and the best return time is expected around 
+            {{final_profit.1}}th day. <b>
+                Expected profit is {{final_profit.2}} Rs. </b> {% else %} is going to <b>decrease.</b> So wait for investment. {% endif %}
+        </p>
+        <br>
+        <h3> Our predictions for next {{numberofdays}} days</h3>
+        {{ graph|safe }}
+        {% endif %}
     </div>
 
 </body>
